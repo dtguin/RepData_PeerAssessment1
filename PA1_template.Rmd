@@ -123,6 +123,8 @@ The value for this interval is `r round(max_steps_value,2)`.
 
 The total number of missing values in the data set is `r length(df_activity$steps[which(is.na(df_activity$steps))])`.
 
+The strategy for imputing the missing data, is to replace the missing steps value with the mean of the 5-minute interval, as averaged across all days for the specific interval, as shown in the code chunk below:
+
 ```{r imputing_missing_values, echol=TRUE}
 #
 ## Make a copy of the original data set, where the NA values will be imputed

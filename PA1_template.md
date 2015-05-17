@@ -135,6 +135,8 @@ The value for this interval is 206.17.
 
 The total number of missing values in the data set is 2304.
 
+The strategy for imputing the missing data, is to replace the missing steps value with the mean of the 5-minute interval, as averaged across all days for the specific interval, as shown in the code chunk below:
+
 
 ```r
 #

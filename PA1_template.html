@@ -327,6 +327,8 @@ max_steps_interval &lt;- substr(max_steps_interval, 12, 16)
 
 <p>The total number of missing values in the data set is 2304.</p>
 
+<p>The strategy for imputing the missing data, is to replace the missing steps value with the mean of the 5-minute interval, as averaged across all days for the specific interval, as shown in the code chunk below:</p>
+
 <pre><code class="r">#
 ## Make a copy of the original data set, where the NA values will be imputed
 df_impute &lt;- df_activity
