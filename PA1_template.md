@@ -13,14 +13,16 @@ The data file used for this analysis is: activity.csv
 and MUST be located in your current working directory.
 
 The activity.csv file is read into the R Object "df_activity" as follows:
-```{r read_data, echo=TRUE}
+
+```r
 df_activity <- read.csv("activity.csv")
 ```
 
 ## What is mean total number of steps taken per day?
 
 In order to calculate the mean total number of steps per day the data (contained in df_activity data frame) needs to be aggregated by day. Which gives use 61 observations.   31 for each day from October 1 through October 31, plus 30 for November 1 through November 31.
-```{r Mean_steps_per_day, echo=TRUE}
+
+```r
 #
 ## Create df_steps from df_activity and drop the interval variable
 df_steps <- df_activity
@@ -42,13 +44,17 @@ The data frame df_days now has 61 observations, 1 for each day, and 2 variales: 
 
 Below is a histogram showing the sum of steps taken per day.  I chose 30 bins for my histogram as this is the avewrage number of days per month, and shows a good ratio of noise to precision which shows the data distribution
 
-```{r histogram_mean_steps, echo=TRUE}
+
+```r
 hist(df_days$sum,breaks=30, main="Histogram showing total number of steps per day.", xlab="Sum of steps.")
 ```
 
+![plot of chunk histogram_mean_steps](figure/histogram_mean_steps-1.png) 
+
 In order to calculate the mean and median values for the total steps per day, the "NA" values must be removed from the aggregated data frame.  The "NA" values are removed, rather than substituted with 0 (or some other value) so as to minimize bias to the calculations.
 
-```{r remove_NA, echo=TRUE}
+
+```r
 #
 ## Remove the NA values for computing the mean and median number of steps taken per day
 df_days <- df_days[which(complete.cases(df_days)),]
@@ -62,15 +68,16 @@ mean_steps = round(mean(df_days$sum), 1)
 ## Calculate the median number of steps per day by taking the median of  of each sum of the daily number of steps per day.
 median_steps = median(df_days$sum)
 ```
-The mean of the number of steps taken per day is `r mean_steps`.
+The mean of the number of steps taken per day is 10766.2.
 
-The median of the number of steps taken per day is `r median_steps`.
+The median of the number of steps taken per day is 10765.
 
 ## What is the average daily activity pattern?
 
 In order to make a time series plot with each 5-minute interval for the x-axis, and the average number of stweps traken, for the y-axis, the data contained in df_activity is aggregated by the 5-minute interval, the 5-minute interval is transformed into POSIXlt values.
 
-```{r daily_activity_plot, echo=TRUE}
+
+```r
 suppressWarnings(library(ggplot2))
 suppressWarnings(library(scales))
 suppressWarnings(library(lubridate))
@@ -103,6 +110,11 @@ ggplot(data=df_int,aes(x=time,y=steps)) +
         ggtitle("Average number of steps, per 5-minute interval") +
         xlab("Time") +
         ylab("Steps")
+```
+
+![plot of chunk daily_activity_plot](figure/daily_activity_plot-1.png) 
+
+```r
 #
 ## Now find the interval with the maximum average number of steps
 #
@@ -115,15 +127,16 @@ max_steps_interval <- as.character(max_steps_interval)
 max_steps_interval <- substr(max_steps_interval, 12, 16)
 ```
 
-The `r max_steps_interval` interval has the maximum number of steps averaged across all days.
+The 08:35 interval has the maximum number of steps averaged across all days.
 
-The value for this interval is `r round(max_steps_value,2)`.
+The value for this interval is 206.17.
 
 ## Imputing missing values
 
-The total number of missing values in the data set is `r length(df_activity$steps[which(is.na(df_activity$steps))])`.
+The total number of missing values in the data set is 2304.
 
-```{r imputing_missing_values, echol=TRUE}
+
+```r
 #
 ## Make a copy of the original data set, where the NA values will be imputed
 df_impute <- df_activity
@@ -152,9 +165,19 @@ aggsum <- aggregate(df_steps$steps, by=list(df_steps$date),FUN=sum)
 ## add <<sum of steps>> per day variable to df_days_impute
 df_days_impute$sum <- aggsum$x
 hist(df_days_impute$sum,breaks=30, main="Histogram showing total number of steps per day with imputed data.", xlab="Sum of steps.")
+```
+
+![plot of chunk imputing_missing_values](figure/imputing_missing_values-1.png) 
+
+```r
 #
 ## Repeat the original histogram... use the df_days data frame from part 1
 hist(df_days$sum,breaks=30, main="Histogram showing total number of steps per day.", xlab="Sum of steps.")
+```
+
+![plot of chunk imputing_missing_values](figure/imputing_missing_values-2.png) 
+
+```r
 #
 ## Calculate the mean number of steps per day by taking the mean of each sum of the daily number of steps per day.
 mean_steps_imputed <- round(mean(df_days$sum), 1)
@@ -162,9 +185,9 @@ mean_steps_imputed <- round(mean(df_days$sum), 1)
 ## Calculate the median number of steps per day by taking the median of  of each sum of the daily number of steps per day.
 median_steps_imputed <- round(median(df_days$sum),0)
 ```
-The mean of the number of steps taken per day using imputed data is `r mean_steps_imputed` versus the "un-imputed" mean `r mean_steps`.
+The mean of the number of steps taken per day using imputed data is 10766.2 versus the "un-imputed" mean 10766.2.
 
-The median of the number of steps taken per day using imputed data is `r median_steps_imputed`,  versus the "un-imputed" median `r median_steps`.
+The median of the number of steps taken per day using imputed data is 10765,  versus the "un-imputed" median 10765.
 
 The histogram using the imputed data, has greater frequecy for the  10000 bin.     However the histograms have roughly the same distribution of steps per interval when averaged over all days.
 
@@ -173,7 +196,8 @@ The histogram using the imputed data, has greater frequecy for the  10000 bin.  
 
 Starting with the imputed data set (df_impute), add a factor variable for "weekday", or "weekend".
 
-```{r create_day_type, echo=TRUE}
+
+```r
 #
 ##
 df_pattern <- df_impute
@@ -209,3 +233,5 @@ ggplot(df_pattern, aes(x=interval, y=steps)) + geom_line(col="cyan") +
         xlab("Interval") +
         ylab("Steps")
 ```
+
+![plot of chunk create_day_type](figure/create_day_type-1.png) 
