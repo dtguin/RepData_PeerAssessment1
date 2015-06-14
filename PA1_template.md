@@ -5,8 +5,6 @@ output:
     keep_md: yes
 ---
 #### Author: David Guinivere
-<br>   <!-- bliank line -->
-<br>   <!-- bliank line -->
 
 ## Loading and preprocessing the data
 The data file used for this analysis is: activity.csv 
@@ -42,7 +40,7 @@ df_days$sum <- aggsum$x
 ```
 The data frame df_days now has 61 observations, 1 for each day, and 2 variales: date and sum.
 
-Below is a histogram showing the sum of steps taken per day.  I chose 30 bins for my histogram as this is the avewrage number of days per month, and shows a good ratio of noise to precision which shows the data distribution
+Below is a histogram showing the sum of steps taken per day.  I chose 30 bins for my histogram as this is the average number of days per month, and shows a good ratio of noise to precision in regards to the data distribution
 
 
 ```r
@@ -65,7 +63,7 @@ options(scipen=999)
 ## Calculate the mean number of steps per day by taking the mean of each sum of the daily number of steps per day.
 mean_steps = round(mean(df_days$sum), 1)
 #
-## Calculate the median number of steps per day by taking the median of  of each sum of the daily number of steps per day.
+## Calculate the median number of steps per day by taking the median of each sum of the daily number of steps per day.
 median_steps = median(df_days$sum)
 ```
 The mean of the number of steps taken per day is 10766.2.
@@ -78,6 +76,7 @@ In order to make a time series plot with each 5-minute interval for the x-axis, 
 
 
 ```r
+suppressWarnings(library(dplyr))
 suppressWarnings(library(ggplot2))
 suppressWarnings(library(scales))
 suppressWarnings(library(lubridate))
@@ -184,14 +183,14 @@ hist(df_days$sum,breaks=30, main="Histogram showing total number of steps per da
 ## Calculate the mean number of steps per day by taking the mean of each sum of the daily number of steps per day.
 mean_steps_imputed <- round(mean(df_days$sum), 1)
 #
-## Calculate the median number of steps per day by taking the median of  of each sum of the daily number of steps per day.
+## Calculate the median number of steps per day by taking the median of each sum of the daily number of steps per day.
 median_steps_imputed <- round(median(df_days$sum),0)
 ```
 The mean of the number of steps taken per day using imputed data is 10766.2 versus the "un-imputed" mean 10766.2.
 
 The median of the number of steps taken per day using imputed data is 10765,  versus the "un-imputed" median 10765.
 
-The histogram using the imputed data, has greater frequecy for the  10000 bin.     However the histograms have roughly the same distribution of steps per interval when averaged over all days.
+The histogram using the imputed data, has greater frequency for the  10000 bin.     However the histograms have roughly the same distribution of steps per interval when averaged over all days.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -200,7 +199,6 @@ Starting with the imputed data set (df_impute), add a factor variable for "weekd
 
 
 ```r
-#
 ##
 df_pattern <- df_impute
 #
@@ -228,8 +226,15 @@ for (idx in 1:length(df_pattern$day_name)) {
 #
 ## Convert $day_type to a factor variable
 df_pattern$day_type <- as.factor(df_pattern$day_type)
+#
+## Create a smaller data frame with only the needed variables
+df_mean <- df_pattern[,c("day_type", "steps", "interval")]
+#
+## Summarize the steps taken to find average steps taken per interval for weekdays vs. weekends
+df_mean <- as.data.frame(summarize(group_by(df_mean, day_type, interval), mean_steps = mean(steps)))
+#
 ## Plot a time series graph, faceted by $day_type
-ggplot(df_pattern, aes(x=interval, y=steps)) + geom_line(col="cyan") +
+ggplot(df_mean, aes(x=interval, y=mean_steps)) + geom_line(col="cyan") +
         facet_grid(day_type ~ .) +
         ggtitle("Average steps by interval, faceted by Weekday or Weekend") +
         xlab("Interval") +
@@ -237,3 +242,5 @@ ggplot(df_pattern, aes(x=interval, y=steps)) + geom_line(col="cyan") +
 ```
 
 ![plot of chunk create_day_type](figure/create_day_type-1.png) 
+
+One notable observation is that during weekdays there is one large peak in the morning, followed by several smaller peaks as throughout the day.  Howver on the weekend days the first peak in the morning is smaller than the first peak the weekdays, and the subsequent peaks during the day on weekends tend to be greater than the subsequent peaks on the weekdays.
